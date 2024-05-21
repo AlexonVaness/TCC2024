@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title mode="md">Catálogo</ion-title>
+    <ion-buttons slot="end">
+      <!-- Adicione um ícone para ativar/desativar a barra de pesquisa -->
+      <ion-button (click)="toggleSearch()">
+        <ion-icon name="search-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <!-- Adicione a barra de pesquisa -->
+  <ion-toolbar *ngIf="searchActive">
+    <ion-searchbar [(ngModel)]="searchTerm" (ionChange)="searchProducts()"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!--BANNER-->
+  <app-banner *ngIf="!isLoading" [bannerImages]="banners"></app-banner>
+
+  <div *ngIf="isLoading">
+    <ion-skeleton-text animated style="height: 25vh;"></ion-skeleton-text>
+  </div>
+
+  <app-loading-restaurant *ngIf="isLoading"></app-loading-restaurant>
+
+  <!-- Adicione as abas de filtro -->
+  <ion-tabs>
+    <ion-tab-bar slot="top">
+      <ion-tab-button (click)="filterByType('fruta')" [class.pressed]="isFilterPressed('fruta')">
+        <ion-icon name="basket-outline"></ion-icon>
+        <ion-label>Frutas</ion-label>
+      </ion-tab-button>
+      <ion-tab-button (click)="filterByType('verdura')" [class.pressed]="isFilterPressed('verdura')">
+        <ion-icon name="leaf-outline"></ion-icon>
+        <ion-label>Verduras</ion-label>
+      </ion-tab-button>
+      <ion-tab-button (click)="filterByType('semente')" [class.pressed]="isFilterPressed('semente')">
+        <ion-icon name="leaf-outline"></ion-icon>
+        <ion-label>Sementes</ion-label>
+      </ion-tab-button>
+      <ion-tab-button (click)="filterByType('animal')" [class.pressed]="isFilterPressed('animal')">
+        <ion-icon name="paw-outline"></ion-icon>
+        <ion-label>Animais</ion-label>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+
+  <ion-list *ngIf="filteredProducts && filteredProducts.length > 0">
+    <ion-item *ngFor="let product of filteredProducts" lines="full">
+      <!-- Adicione a verificação do UID do usuário autenticado -->
+      <ng-container *ngIf="product.userId !== currentUserUID">
+        <ion-thumbnail slot="start">
+          <!-- Use o campo imageUrl para exibir a imagem -->
+          <img [src]="product.imageUrl" alt="Product Image">
+        </ion-thumbnail>
+        <ion-label>
+          <h2>{{ product.title }}</h2>
+          <p>Preço: R$ {{ product.price }}</p>
+          <p>Data de Produção: {{ product.productionDate }}</p>
+          <p>Vendedor: {{ product.nome }}</p> <!-- Exibe o nome do vendedor -->
+        </ion-label>
+        <ion-icon name="eye-outline" slot="end" (click)="verDetalhes(product)"></ion-icon>
+      </ng-container>
+    </ion-item>
+  </ion-list>
+</ion-content>
